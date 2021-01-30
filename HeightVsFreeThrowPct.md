@@ -1,12 +1,10 @@
 # Import Dependencies
 
-
 ```python
 import pandas as pd
 ```
 
 # Load Data
-
 
 ```python
 df = pd.read_csv('nbaPlayers.csv')
@@ -14,23 +12,7 @@ df = pd.read_csv('nbaPlayers.csv')
 df
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -172,10 +154,7 @@ df
 <p>4878 rows × 8 columns</p>
 </div>
 
-
-
 # Preprocess Data
-
 
 ```python
 # Get number of years played as new column
@@ -192,23 +171,7 @@ df['Height(cm)'] = df.apply(lambda row: convertHeight(row), axis=1)
 df
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -374,9 +337,6 @@ df
 <p>4878 rows × 10 columns</p>
 </div>
 
-
-
-
 ```python
 # Get active players
 active_players_df = df[df['To'] == 2021]
@@ -384,23 +344,7 @@ active_players_df = df[df['To'] == 2021]
 active_players_df
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -566,9 +510,6 @@ active_players_df
 <p>470 rows × 10 columns</p>
 </div>
 
-
-
-
 ```python
 # Get active players with at least 1 years experience
 experienced_players = active_players_df[active_players_df['Years Played'] >= 1]
@@ -576,23 +517,7 @@ experienced_players = active_players_df[active_players_df['Years Played'] >= 1]
 experienced_players
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -758,13 +683,10 @@ experienced_players
 <p>395 rows × 10 columns</p>
 </div>
 
-
-
-
 ```python
+# Convert filtered players into a csv file
 experienced_players.to_csv('filteredPlayers.csv')
 ```
-
 
 ```python
 # Remove usernames of players
@@ -772,36 +694,12 @@ def remove_slugs(row):
     name = row['Player']
     name = name.split("|")[0]
     return name
-    
+
 experienced_players['Player'] = experienced_players.apply(lambda row: remove_slugs(row), axis=1)
 experienced_players
 ```
 
-    <ipython-input-7-a5fed35f497e>:7: SettingWithCopyWarning: 
-    A value is trying to be set on a copy of a slice from a DataFrame.
-    Try using .loc[row_indexer,col_indexer] = value instead
-    
-    See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-      experienced_players['Player'] = experienced_players.apply(lambda row: remove_slugs(row), axis=1)
-
-
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -967,256 +865,19 @@ experienced_players
 <p>395 rows × 10 columns</p>
 </div>
 
-
-
 # Working with basketball-reference-scraper API
-
 
 ```python
 from basketball_reference_scraper.players import get_stats
 ```
 
-## Testing API
-
-
-```python
-# Convert to list and use with basketball_reference_scraper
-names = experienced_players['Player'].to_list()
-
-try:
-    player_df = get_stats(names[30])
-except AttributeError:
-    #Didn't work
-    print(names[16])
-    
-#player_df['FT%'].mean()
-#player_df
-```
-
-    You searched for "Jordan Bell"
-    10 results found.
-    0: Jordan Bell
-    1: Jordan Hill
-    2: Jordan Bone
-    3: Jordan Ford
-    4: Jordan Loyd
-    5: Jordan Poole
-    6: Jordan Sibert
-    7: Jordan Bowden
-    8: Ryan Kelly
-    9: Jordan McRae
-    Results for Jordan Bell:
-    
-
-
 ## Add Career Free Throw Pct to experienced_players Dataframe
 
+##### The API used to collect the data was not able to get the Free Throw Percentage of all active and experienced players. Players that were left out were stored in a list. These players' Free Throw Percentage will be retrieved from the website (basketball-reference.com) and added manually.
 
 ```python
 experienced_players.insert(10, 'FT Pct', 0)
 ```
-
-
-```python
-experienced_players
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Player</th>
-      <th>From</th>
-      <th>To</th>
-      <th>Pos</th>
-      <th>Ht</th>
-      <th>Wt</th>
-      <th>Birth Date</th>
-      <th>Colleges</th>
-      <th>Years Played</th>
-      <th>Height(cm)</th>
-      <th>FT Pct</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>20</th>
-      <td>Jaylen Adams</td>
-      <td>2019</td>
-      <td>2021</td>
-      <td>G</td>
-      <td>6-0</td>
-      <td>225.0</td>
-      <td>May 4 1996</td>
-      <td>St. Bonaventure</td>
-      <td>2</td>
-      <td>182.88</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>Steven Adams</td>
-      <td>2014</td>
-      <td>2021</td>
-      <td>C</td>
-      <td>6-11</td>
-      <td>265.0</td>
-      <td>July 20 1993</td>
-      <td>Pitt</td>
-      <td>7</td>
-      <td>210.82</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>Bam Adebayo</td>
-      <td>2018</td>
-      <td>2021</td>
-      <td>C-F</td>
-      <td>6-9</td>
-      <td>255.0</td>
-      <td>July 18 1997</td>
-      <td>Kentucky</td>
-      <td>3</td>
-      <td>205.74</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>44</th>
-      <td>LaMarcus Aldridge</td>
-      <td>2007</td>
-      <td>2021</td>
-      <td>F-C</td>
-      <td>6-11</td>
-      <td>250.0</td>
-      <td>July 19 1985</td>
-      <td>Texas</td>
-      <td>14</td>
-      <td>210.82</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>54</th>
-      <td>Nickeil Alexander-Walker</td>
-      <td>2020</td>
-      <td>2021</td>
-      <td>G</td>
-      <td>6-6</td>
-      <td>205.0</td>
-      <td>September 2 1998</td>
-      <td>Virginia Tech</td>
-      <td>1</td>
-      <td>198.12</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>4823</th>
-      <td>Delon Wright</td>
-      <td>2016</td>
-      <td>2021</td>
-      <td>G</td>
-      <td>6-5</td>
-      <td>185.0</td>
-      <td>April 26 1992</td>
-      <td>Utah</td>
-      <td>5</td>
-      <td>195.58</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4854</th>
-      <td>Thaddeus Young</td>
-      <td>2008</td>
-      <td>2021</td>
-      <td>F</td>
-      <td>6-8</td>
-      <td>235.0</td>
-      <td>June 21 1988</td>
-      <td>Georgia Tech</td>
-      <td>13</td>
-      <td>203.20</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4856</th>
-      <td>Trae Young</td>
-      <td>2019</td>
-      <td>2021</td>
-      <td>G</td>
-      <td>6-1</td>
-      <td>180.0</td>
-      <td>September 19 1998</td>
-      <td>Oklahoma</td>
-      <td>2</td>
-      <td>185.42</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4860</th>
-      <td>Cody Zeller</td>
-      <td>2014</td>
-      <td>2021</td>
-      <td>C-F</td>
-      <td>6-11</td>
-      <td>240.0</td>
-      <td>October 5 1992</td>
-      <td>Indiana</td>
-      <td>7</td>
-      <td>210.82</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4876</th>
-      <td>Ivica Zubac</td>
-      <td>2017</td>
-      <td>2021</td>
-      <td>C</td>
-      <td>7-0</td>
-      <td>240.0</td>
-      <td>March 18 1997</td>
-      <td>NaN</td>
-      <td>4</td>
-      <td>213.36</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-<p>395 rows × 11 columns</p>
-</div>
-
-
-
 
 ```python
 players_left = []
@@ -1245,7 +906,7 @@ experienced_players
     4: Steven Adams
     5: Jaylen Hoard
     Results for Jaylen Adams:
-    
+
     You searched for "Steven Adams"
     6 results found.
     0: Steven Adams
@@ -1255,34 +916,34 @@ experienced_players
     4: Steve Hamer
     5: Steve Nash
     Results for Steven Adams:
-    
+
     You searched for "Bam Adebayo"
     1 result found.
     Bam Adebayo
     Results for Bam Adebayo:
-    
+
     You searched for "LaMarcus Aldridge"
     1 result found.
     LaMarcus Aldridge
     Results for LaMarcus Aldridge:
-    
+
     You searched for "Nickeil Alexander-Walker"
     1 result found.
     Nickeil Alexander-Walker
     Results for Nickeil Alexander-Walker:
-    
+
     You searched for "Grayson Allen"
     2 results found.
     0: Grayson Allen
     1: Ray Allen
     Results for Grayson Allen:
-    
+
     You searched for "Jarrett Allen"
     2 results found.
     0: Jarrett Allen
     1: Jarrett Culver
     Results for Jarrett Allen:
-    
+
     You searched for "Kyle Anderson"
     16 results found.
     0: Kyle Anderson
@@ -1302,49 +963,49 @@ experienced_players
     14: Willie Anderson
     15: Kyle Alexander
     Results for Kyle Anderson:
-    
+
     You searched for "Giannis Antetokounmpo"
     2 results found.
     0: Giannis Antetokounmpo
     1: Thanasis Antetokounmpo
     Results for Giannis Antetokounmpo:
-    
+
     You searched for "Kostas Antetokounmpo"
     1 result found.
     Kostas Antetokounmpo
     Results for Kostas Antetokounmpo:
-    
+
     You searched for "Thanasis Antetokounmpo"
     2 results found.
     0: Thanasis Antetokounmpo
     1: Giannis Antetokounmpo
     Results for Thanasis Antetokounmpo:
-    
+
     You searched for "Carmelo Anthony"
     1 result found.
     Carmelo Anthony
     Results for Carmelo Anthony:
-    
+
     You searched for "OG Anunoby"
     1 result found.
     OG Anunoby
     Results for OG Anunoby:
-    
+
     You searched for "Ryan Arcidiacono"
     1 result found.
     Ryan Arcidiacono
     Results for Ryan Arcidiacono:
-    
+
     You searched for "D.J. Augustin"
     1 result found.
     D.J. Augustin
     Results for D.J. Augustin:
-    
+
     You searched for "Deandre Ayton"
     1 result found.
     Deandre Ayton
     Results for Deandre Ayton:
-    
+
     You searched for "Dwayne Bacon"
     4 results found.
     0: Dwayne Bacon
@@ -1352,13 +1013,13 @@ experienced_players
     2: Dwayne Morton
     3: Wayne Pack
     Results for Dwayne Bacon:
-    
+
     You searched for "Marvin Bagley"
     2 results found.
     0: Marvin Bagley
     1: Marvin Barnes
     Results for Marvin Bagley:
-    
+
     You searched for "Lonzo Ball"
     4 results found.
     0: Lonzo Ball
@@ -1366,19 +1027,19 @@ experienced_players
     2: Donta Hall
     3: Alonzo Gee
     Results for Lonzo Ball:
-    
+
     You searched for "Mohamed Bamba"
     1 result found.
     Mohamed Bamba
     Results for Mohamed Bamba:
-    
+
     You searched for "Harrison Barnes"
     3 results found.
     0: Harrison Barnes
     1: Harry Barnes
     2: Marvin Barnes
     Results for Harrison Barnes:
-    
+
     You searched for "RJ Barrett"
     7 results found.
     0: RJ Barrett
@@ -1389,7 +1050,7 @@ experienced_players
     5: Drew Barry
     6: Rick Barry
     Results for RJ Barrett:
-    
+
     You searched for "Will Barton"
     8 results found.
     0: Will Barton
@@ -1401,17 +1062,17 @@ experienced_players
     6: Bill Newton
     7: Will Bynum
     Results for Will Barton:
-    
+
     You searched for "Keita Bates-Diop"
     1 result found.
     Keita Bates-Diop
     Results for Keita Bates-Diop:
-    
+
     You searched for "Nicolas Batum"
     1 result found.
     Nicolas Batum
     Results for Nicolas Batum:
-    
+
     You searched for "Aron Baynes"
     8 results found.
     0: Aron Baynes
@@ -1423,31 +1084,31 @@ experienced_players
     6: Tharon Mayes
     7: Cameron Payne
     Results for Aron Baynes:
-    
+
     You searched for "Kent Bazemore"
     1 result found.
     Kent Bazemore
     Results for Kent Bazemore:
-    
+
     You searched for "Darius Bazley"
     3 results found.
     0: Darius Bazley
     1: Darius Miles
     2: Darius Miller
     Results for Darius Bazley:
-    
+
     You searched for "Bradley Beal"
     1 result found.
     Bradley Beal
     Results for Bradley Beal:
-    
+
     You searched for "Malik Beasley"
     3 results found.
     0: Malik Beasley
     1: Malik Sealy
     2: Malik Allen
     Results for Malik Beasley:
-    
+
     You searched for "Jordan Bell"
     10 results found.
     0: Jordan Bell
@@ -1461,61 +1122,61 @@ experienced_players
     8: Ryan Kelly
     9: Jordan McRae
     Results for Jordan Bell:
-    
+
     You searched for "DeAndre' Bembry"
     1 result found.
     DeAndre' Bembry
     Results for DeAndre' Bembry:
-    
+
     You searched for "Dāvis Bertāns"
     3 results found.
     0: Davis Bertans
     1: Dairis Bertans
     2: David Burns
     Results for Davis Bertans:
-    
+
     You searched for "Patrick Beverley"
     1 result found.
     Patrick Beverley
     Results for Patrick Beverley:
-    
+
     You searched for "Khem Birch"
     1 result found.
     Khem Birch
     Results for Khem Birch:
-    
+
     You searched for "Goga Bitadze"
     1 result found.
     Goga Bitadze
     Results for Goga Bitadze:
-    
+
     You searched for "Bismack Biyombo"
     1 result found.
     Bismack Biyombo
     Results for Bismack Biyombo:
-    
+
     You searched for "Nemanja Bjelica"
     1 result found.
     Nemanja Bjelica
     Results for Nemanja Bjelica:
-    
+
     You searched for "Eric Bledsoe"
     1 result found.
     Eric Bledsoe
     Results for Eric Bledsoe:
-    
+
     You searched for "Bogdan Bogdanović"
     2 results found.
     0: Bogdan Bogdanovic
     1: Bojan Bogdanovic
     Results for Bogdan Bogdanovic:
-    
+
     You searched for "Bojan Bogdanović"
     2 results found.
     0: Bojan Bogdanovic
     1: Bogdan Bogdanovic
     Results for Bojan Bogdanovic:
-    
+
     You searched for "Bol Bol"
     11 results found.
     0: Bol Bol
@@ -1530,12 +1191,12 @@ experienced_players
     9: Joe Wolf
     10: Bob Wood
     Results for Bol Bol:
-    
+
     You searched for "Marques Bolden"
     1 result found.
     Marques Bolden
     Results for Marques Bolden:
-    
+
     You searched for "Jordan Bone"
     10 results found.
     0: Jordan Bone
@@ -1549,13 +1210,13 @@ experienced_players
     8: Jordan McRae
     9: Ryan Bowen
     Results for Jordan Bone:
-    
+
     You searched for "Isaac Bonga"
     2 results found.
     0: Isaac Bonga
     1: Isaac Okoro
     Results for Isaac Bonga:
-    
+
     You searched for "Devin Booker"
     11 results found.
     0: Devin Booker
@@ -1570,7 +1231,7 @@ experienced_players
     9: Kevin Porter
     10: Devin Ebanks
     Results for Devin Booker:
-    
+
     You searched for "Chris Boucher"
     5 results found.
     0: Chris Boucher
@@ -1579,7 +1240,7 @@ experienced_players
     3: Chris Porter
     4: Chris Herren
     Results for Chris Boucher:
-    
+
     You searched for "Brian Bowen"
     8 results found.
     0: Brian Bowen
@@ -1591,7 +1252,7 @@ experienced_players
     6: Brian Rowsom
     7: Jordan Bone
     Results for Brian Bowen:
-    
+
     You searched for "Avery Bradley"
     4 results found.
     0: Avery Bradley
@@ -1599,7 +1260,7 @@ experienced_players
     2: Joe Bradley
     3: Tony Bradley
     Results for Avery Bradley:
-    
+
     You searched for "Tony Bradley"
     10 results found.
     0: Tony Bradley
@@ -1613,42 +1274,42 @@ experienced_players
     8: Bill Bradley
     9: Jim Bradley
     Results for Tony Bradley:
-    
+
     You searched for "Jarrell Brantley"
     1 result found.
     Jarrell Brantley
     Results for Jarrell Brantley:
-    
+
     You searched for "Ignas Brazdeikis"
     1 result found.
     Ignas Brazdeikis
     Results for Ignas Brazdeikis:
-    
+
     You searched for "Mikal Bridges"
     3 results found.
     0: Mikal Bridges
     1: Bill Bridges
     2: Miles Bridges
     Results for Mikal Bridges:
-    
+
     You searched for "Miles Bridges"
     3 results found.
     0: Miles Bridges
     1: Bill Bridges
     2: Mikal Bridges
     Results for Miles Bridges:
-    
+
     You searched for "Malcolm Brogdon"
     1 result found.
     Malcolm Brogdon
     Results for Malcolm Brogdon:
-    
+
     You searched for "Dillon Brooks"
     2 results found.
     0: Dillon Brooks
     1: Aaron Brooks
     Results for Dillon Brooks:
-    
+
     You searched for "Bruce Brown"
     16 results found.
     0: Bruce Brown
@@ -1668,7 +1329,7 @@ experienced_players
     14: Troy Brown
     15: Bryce Drew
     Results for Bruce Brown:
-    
+
     You searched for "Jaylen Brown"
     10 results found.
     0: Jaylen Brown
@@ -1682,7 +1343,7 @@ experienced_players
     8: Jaylen Hoard
     9: Jalen Jones
     Results for Jaylen Brown:
-    
+
     You searched for "Moses Brown"
     17 results found.
     0: Moses Brown
@@ -1703,12 +1364,12 @@ experienced_players
     15: Myron Brown
     16: Tony Brown
     Results for Moses Brown:
-    
+
     You searched for "Sterling Brown"
     1 result found.
     Sterling Brown
     Results for Sterling Brown:
-    
+
     You searched for "Troy Brown"
     26 results found.
     0: Troy Brown
@@ -1738,23 +1399,23 @@ experienced_players
     24: Ron Boone
     25: Trey Burke
     Results for Troy Brown:
-    
+
     You searched for "Jalen Brunson"
     1 result found.
     Jalen Brunson
     Results for Jalen Brunson:
-    
+
     You searched for "Thomas Bryant"
     2 results found.
     0: Thomas Bryant
     1: Thomas Jordan
     Results for Thomas Bryant:
-    
+
     You searched for "Reggie Bullock"
     1 result found.
     Reggie Bullock
     Results for Reggie Bullock:
-    
+
     You searched for "Trey Burke"
     5 results found.
     0: Trey Burke
@@ -1763,14 +1424,14 @@ experienced_players
     3: Corey Beck
     4: Troy Bell
     Results for Trey Burke:
-    
+
     You searched for "Alec Burks"
     3 results found.
     0: Alec Burks
     1: Trey Burke
     2: Alex Kirk
     Results for Alec Burks:
-    
+
     You searched for "Jimmy Butler"
     6 results found.
     0: Jimmy Butler
@@ -1780,29 +1441,29 @@ experienced_players
     4: Jimmy Oliver
     5: Jimmy Walker
     Results for Jimmy Butler:
-    
+
     You searched for "Bruno Caboclo"
     1 result found.
     Bruno Caboclo
     Results for Bruno Caboclo:
-    
+
     You searched for "Kentavious Caldwell-Pope"
     1 result found.
     Kentavious Caldwell-Pope
     Results for Kentavious Caldwell-Pope:
-    
+
     You searched for "Vlatko Čančar"
     1 result found.
     Vlatko Cancar
     Results for Vlatko Cancar:
-    
+
     You searched for "Clint Capela"
     3 results found.
     0: Clint Capela
     1: Clint Wager
     2: Clint McDaniel
     Results for Clint Capela:
-    
+
     You searched for "Jevon Carter"
     5 results found.
     0: Jevon Carter
@@ -1811,18 +1472,18 @@ experienced_players
     3: Kevin Porter
     4: Kevin Porter
     Results for Jevon Carter:
-    
+
     You searched for "Wendell Carter"
     2 results found.
     0: Wendell Carter
     1: Wendell Ladner
     Results for Wendell Carter:
-    
+
     You searched for "Michael Carter-Williams"
     1 result found.
     Michael Carter-Williams
     Results for Michael Carter-Williams:
-    
+
     You searched for "Alex Caruso"
     6 results found.
     0: Alex Caruso
@@ -1832,23 +1493,23 @@ experienced_players
     4: Alex Groza
     5: Alex Hannum
     Results for Alex Caruso:
-    
+
     You searched for "Willie Cauley-Stein"
     1 result found.
     Willie Cauley-Stein
     Results for Willie Cauley-Stein:
-    
+
     You searched for "Chris Chiozza"
     2 results found.
     0: Chris Chiozza
     1: Chris Childs
     Results for Chris Chiozza:
-    
+
     You searched for "Marquese Chriss"
     1 result found.
     Marquese Chriss
     Results for Marquese Chriss:
-    
+
     You searched for "Gary Clark"
     15 results found.
     0: Gary Clark
@@ -1867,22 +1528,22 @@ experienced_players
     13: Gary Keller
     14: Gary Zeller
     Results for Gary Clark:
-    
+
     You searched for "Brandon Clarke"
     1 result found.
     Brandon Clarke
     Results for Brandon Clarke:
-    
+
     You searched for "Jordan Clarkson"
     1 result found.
     Jordan Clarkson
     Results for Jordan Clarkson:
-    
+
     You searched for "Amir Coffey"
     1 result found.
     Amir Coffey
     Results for Amir Coffey:
-    
+
     You searched for "John Collins"
     17 results found.
     0: John Collins
@@ -1903,7 +1564,7 @@ experienced_players
     15: John Williams
     16: John Tschogl
     Results for John Collins:
-    
+
     You searched for "Mike Conley"
     17 results found.
     0: Mike Conley
@@ -1924,35 +1585,35 @@ experienced_players
     15: Mike Lewis
     16: Mike Jackson
     Results for Mike Conley:
-    
+
     You searched for "Pat Connaughton"
     1 result found.
     Pat Connaughton
     Results for Pat Connaughton:
-    
+
     You searched for "Quinn Cook"
     3 results found.
     0: Quinn Cook
     1: Brian Cook
     2: Quincy Acy
     Results for Quinn Cook:
-    
+
     You searched for "DeMarcus Cousins"
     2 results found.
     0: DeMarcus Cousins
     1: Marcus Cousin
     Results for DeMarcus Cousins:
-    
+
     You searched for "Robert Covington"
     1 result found.
     Robert Covington
     Results for Robert Covington:
-    
+
     You searched for "Torrey Craig"
     1 result found.
     Torrey Craig
     Results for Torrey Craig:
-    
+
     You searched for "Jae Crowder"
     4 results found.
     0: Jae Crowder
@@ -1960,13 +1621,13 @@ experienced_players
     2: Corey Crowder
     3: Joe Strawder
     Results for Jae Crowder:
-    
+
     You searched for "Jarrett Culver"
     2 results found.
     0: Jarrett Culver
     1: Jarrett Allen
     Results for Jarrett Culver:
-    
+
     You searched for "Seth Curry"
     4 results found.
     0: Seth Curry
@@ -1974,14 +1635,14 @@ experienced_players
     2: Eddy Curry
     3: Stephen Curry
     Results for Seth Curry:
-    
+
     You searched for "Stephen Curry"
     3 results found.
     0: Stephen Curry
     1: Stephen Chubin
     2: Seth Curry
     Results for Stephen Curry:
-    
+
     You searched for "Anthony Davis"
     9 results found.
     0: Anthony Davis
@@ -1994,7 +1655,7 @@ experienced_players
     7: Anthony Jones
     8: Anthony Mason
     Results for Anthony Davis:
-    
+
     You searched for "Ed Davis"
     34 results found.
     0: Ed Davis
@@ -2032,82 +1693,82 @@ experienced_players
     32: Med Park
     33: Todd Day
     Results for Ed Davis:
-    
+
     You searched for "Terence Davis"
     3 results found.
     0: Terence Davis
     1: Terry Davis
     2: Terence Morris
     Results for Terence Davis:
-    
+
     You searched for "DeMar DeRozan"
     1 result found.
     DeMar DeRozan
     Results for DeMar DeRozan:
-    
+
     You searched for "Donte DiVincenzo"
     1 result found.
     Donte DiVincenzo
     Results for Donte DiVincenzo:
-    
+
     You searched for "Hamidou Diallo"
     1 result found.
     Hamidou Diallo
     Results for Hamidou Diallo:
-    
+
     You searched for "Gorgui Dieng"
     1 result found.
     Gorgui Dieng
     Results for Gorgui Dieng:
-    
+
     You searched for "Spencer Dinwiddie"
     1 result found.
     Spencer Dinwiddie
     Results for Spencer Dinwiddie:
-    
+
     You searched for "Luka Dončić"
     1 result found.
     Luka Doncic
     Results for Luka Doncic:
-    
+
     You searched for "Luguentz Dort"
     1 result found.
     Luguentz Dort
     Results for Luguentz Dort:
-    
+
     You searched for "Damyean Dotson"
     1 result found.
     Damyean Dotson
     Results for Damyean Dotson:
-    
+
     You searched for "Sekou Doumbouya"
     1 result found.
     Sekou Doumbouya
     Results for Sekou Doumbouya:
-    
+
     You searched for "PJ Dozier"
     1 result found.
     PJ Dozier
     Results for PJ Dozier:
-    
+
     You searched for "Goran Dragić"
     2 results found.
     0: Goran Dragic
     1: Zoran Dragic
     Results for Goran Dragic:
-    
+
     You searched for "Andre Drummond"
     1 result found.
     Andre Drummond
     Results for Andre Drummond:
-    
+
     You searched for "Jared Dudley"
     3 results found.
     0: Jared Dudley
     1: Charles Dudley
     2: Chris Dudley
     Results for Jared Dudley:
-    
+
     You searched for "Kevin Durant"
     5 results found.
     0: Kevin Durant
@@ -2116,24 +1777,24 @@ experienced_players
     3: Ken Durrett
     4: Kevin Martin
     Results for Kevin Durant:
-    
+
     You searched for "Carsen Edwards"
     3 results found.
     0: Carsen Edwards
     1: Corsley Edwards
     2: James Edwards
     Results for Carsen Edwards:
-    
+
     You searched for "Wayne Ellington"
     1 result found.
     Wayne Ellington
     Results for Wayne Ellington:
-    
+
     You searched for "Joel Embiid"
     1 result found.
     Joel Embiid
     Results for Joel Embiid:
-    
+
     You searched for "James Ennis"
     11 results found.
     0: James Ennis
@@ -2148,22 +1809,22 @@ experienced_players
     9: James Harden
     10: James Phelan
     Results for James Ennis:
-    
+
     You searched for "Drew Eubanks"
     1 result found.
     Drew Eubanks
     Results for Drew Eubanks:
-    
+
     You searched for "Dante Exum"
     1 result found.
     Dante Exum
     Results for Dante Exum:
-    
+
     You searched for "Tacko Fall"
     1 result found.
     Tacko Fall
     Results for Tacko Fall:
-    
+
     You searched for "Derrick Favors"
     4 results found.
     0: Derrick Favors
@@ -2171,49 +1832,49 @@ experienced_players
     2: Derrick Rose
     3: Derrick Walton
     Results for Derrick Favors:
-    
+
     You searched for "Cristiano Felício"
     1 result found.
     Cristiano Felicio
     Results for Cristiano Felicio:
-    
+
     You searched for "Terrance Ferguson"
     1 result found.
     Terrance Ferguson
     Results for Terrance Ferguson:
-    
+
     You searched for "Bruno Fernando"
     1 result found.
     Bruno Fernando
     Results for Bruno Fernando:
-    
+
     You searched for "Yogi Ferrell"
     1 result found.
     Yogi Ferrell
     Results for Yogi Ferrell:
-    
+
     You searched for "Dorian Finney-Smith"
     1 result found.
     Dorian Finney-Smith
     Results for Dorian Finney-Smith:
-    
+
     You searched for "Bryn Forbes"
     2 results found.
     0: Bryn Forbes
     1: Gary Forbes
     Results for Bryn Forbes:
-    
+
     You searched for "Evan Fournier"
     2 results found.
     0: Evan Fournier
     1: Evan Turner
     Results for Evan Fournier:
-    
+
     You searched for "De'Aaron Fox"
     1 result found.
     De'Aaron Fox
     Results for De'Aaron Fox:
-    
+
     You searched for "Tim Frazier"
     4 results found.
     0: Tim Frazier
@@ -2221,34 +1882,34 @@ experienced_players
     2: Jim Farmer
     3: Walt Frazier
     Results for Tim Frazier:
-    
+
     You searched for "Markelle Fultz"
     1 result found.
     Markelle Fultz
     Results for Markelle Fultz:
-    
+
     You searched for "Daniel Gafford"
     1 result found.
     Daniel Gafford
     Results for Daniel Gafford:
-    
+
     You searched for "Danilo Gallinari"
     1 result found.
     Danilo Gallinari
     Results for Danilo Gallinari:
-    
+
     You searched for "Langston Galloway"
     1 result found.
     Langston Galloway
     Results for Langston Galloway:
-    
+
     You searched for "Darius Garland"
     3 results found.
     0: Darius Garland
     1: Gary Garland
     2: Darius Songaila
     Results for Darius Garland:
-    
+
     You searched for "Marc Gasol"
     7 results found.
     0: Marc Gasol
@@ -2259,7 +1920,7 @@ experienced_players
     5: Mark Davis
     6: Mark Davis
     Results for Marc Gasol:
-    
+
     You searched for "Rudy Gay"
     4 results found.
     0: Rudy Gay
@@ -2267,7 +1928,7 @@ experienced_players
     2: Ed Gray
     3: Gary Gray
     Results for Rudy Gay:
-    
+
     You searched for "Paul George"
     12 results found.
     0: Paul George
@@ -2283,7 +1944,7 @@ experienced_players
     10: Paul Nolen
     11: Paul Seymour
     Results for Paul George:
-    
+
     You searched for "Harry Giles"
     15 results found.
     0: Harry Giles
@@ -2302,23 +1963,23 @@ experienced_players
     13: Harry Zeller
     14: Larry Fogle
     Results for Harry Giles:
-    
+
     You searched for "Shai Gilgeous-Alexander"
     1 result found.
     Shai Gilgeous-Alexander
     Results for Shai Gilgeous-Alexander:
-    
+
     You searched for "Rudy Gobert"
     2 results found.
     0: Rudy Gobert
     1: Ray Tolbert
     Results for Rudy Gobert:
-    
+
     You searched for "Brandon Goodwin"
     1 result found.
     Brandon Goodwin
     Results for Brandon Goodwin:
-    
+
     You searched for "Aaron Gordon"
     6 results found.
     0: Aaron Gordon
@@ -2328,7 +1989,7 @@ experienced_players
     4: Paul Gordon
     5: Aaron Gray
     Results for Aaron Gordon:
-    
+
     You searched for "Eric Gordon"
     12 results found.
     0: Eric Gordon
@@ -2344,12 +2005,12 @@ experienced_players
     10: Eric Maynor
     11: Eric Money
     Results for Eric Gordon:
-    
+
     You searched for "Devonte' Graham"
     1 result found.
     Devonte' Graham
     Results for Devonte' Graham:
-    
+
     You searched for "Jerami Grant"
     4 results found.
     0: Jerami Grant
@@ -2357,7 +2018,7 @@ experienced_players
     2: Horace Grant
     3: Travis Grant
     Results for Jerami Grant:
-    
+
     You searched for "Danny Green"
     20 results found.
     0: Danny Green
@@ -2381,24 +2042,24 @@ experienced_players
     18: Danny Wagner
     19: Danny Young
     Results for Danny Green:
-    
+
     You searched for "Draymond Green"
     2 results found.
     0: Draymond Green
     1: Raymond Brown
     Results for Draymond Green:
-    
+
     You searched for "JaMychal Green"
     1 result found.
     JaMychal Green
     Results for JaMychal Green:
-    
+
     You searched for "Javonte Green"
     2 results found.
     0: Javonte Green
     1: Donte Greene
     Results for Javonte Green:
-    
+
     You searched for "Jeff Green"
     21 results found.
     0: Jeff Green
@@ -2423,14 +2084,14 @@ experienced_players
     19: Jeff Slade
     20: Jeff Teague
     Results for Jeff Green:
-    
+
     You searched for "Blake Griffin"
     3 results found.
     0: Blake Griffin
     1: Eddie Griffin
     2: Paul Griffin
     Results for Blake Griffin:
-    
+
     You searched for "Kyle Guy"
     5 results found.
     0: Kyle Guy
@@ -2439,18 +2100,18 @@ experienced_players
     3: Kyle Kuzma
     4: Kyle Lowry
     Results for Kyle Guy:
-    
+
     You searched for "Rui Hachimura"
     1 result found.
     Rui Hachimura
     Results for Rui Hachimura:
-    
+
     You searched for "Tim Hardaway"
     2 results found.
     0: Tim Hardaway
     1: Tim Hardaway Jr.
     Results for Tim Hardaway:
-    
+
     You searched for "James Harden"
     11 results found.
     0: James Harden
@@ -2465,13 +2126,13 @@ experienced_players
     9: Jaylen Hoard
     10: James Thomas
     Results for James Harden:
-    
+
     You searched for "Maurice Harkless"
     2 results found.
     0: Maurice Harkless
     1: Maurice McHartley
     Results for Maurice Harkless:
-    
+
     You searched for "Jared Harper"
     8 results found.
     0: Jared Harper
@@ -2483,12 +2144,12 @@ experienced_players
     6: Ron Harper
     7: Jared Reiner
     Results for Jared Harper:
-    
+
     You searched for "Montrezl Harrell"
     1 result found.
     Montrezl Harrell
     Results for Montrezl Harrell:
-    
+
     You searched for "Gary Harris"
     14 results found.
     0: Gary Harris
@@ -2506,7 +2167,7 @@ experienced_players
     12: Gary Hill
     13: Gary Turner
     Results for Gary Harris:
-    
+
     You searched for "Joe Harris"
     20 results found.
     0: Joe Harris
@@ -2530,7 +2191,7 @@ experienced_players
     18: Joe Thomas
     19: Jason Hart
     Results for Joe Harris:
-    
+
     You searched for "Tobias Harris"
     6 results found.
     0: Tobias Harris
@@ -2540,12 +2201,12 @@ experienced_players
     4: Tony Harris
     5: Bob Harrison
     Results for Tobias Harris:
-    
+
     You searched for "Shaquille Harrison"
     1 result found.
     Shaquille Harrison
     Results for Shaquille Harrison:
-    
+
     You searched for "Josh Hart"
     9 results found.
     0: Josh Hart
@@ -2558,34 +2219,34 @@ experienced_players
     7: Josh Gray
     8: Josh Smith
     Results for Josh Hart:
-    
+
     You searched for "Isaiah Hartenstein"
     1 result found.
     Isaiah Hartenstein
     Results for Isaiah Hartenstein:
-    
+
     You searched for "Jaxson Hayes"
     3 results found.
     0: Jaxson Hayes
     1: Jason Hart
     2: Jarvis Hayes
     Results for Jaxson Hayes:
-    
+
     You searched for "Gordon Hayward"
     1 result found.
     Gordon Hayward
     Results for Gordon Hayward:
-    
+
     You searched for "Juan Hernangómez"
     1 result found.
     Juan Hernangomez
     Results for Juan Hernangomez:
-    
+
     You searched for "Willy Hernangómez"
     1 result found.
     Willy Hernangomez
     Results for Willy Hernangomez:
-    
+
     You searched for "Tyler Herro"
     4 results found.
     0: Tyler Herro
@@ -2593,12 +2254,12 @@ experienced_players
     2: Tyler Cook
     3: Tyler Zeller
     Results for Tyler Herro:
-    
+
     You searched for "Buddy Hield"
     1 result found.
     Buddy Hield
     Results for Buddy Hield:
-    
+
     You searched for "George Hill"
     11 results found.
     0: George Hill
@@ -2613,35 +2274,35 @@ experienced_players
     9: George Bucci
     10: George Lynch
     Results for George Hill:
-    
+
     You searched for "Solomon Hill"
     2 results found.
     0: Solomon Hill
     1: Solomon Alabi
     Results for Solomon Hill:
-    
+
     You searched for "Aaron Holiday"
     2 results found.
     0: Aaron Holiday
     1: Jrue Holiday
     Results for Aaron Holiday:
-    
+
     You searched for "Jrue Holiday"
     2 results found.
     0: Jrue Holiday
     1: Aaron Holiday
     Results for Jrue Holiday:
-    
+
     You searched for "Justin Holiday"
     1 result found.
     Justin Holiday
     Results for Justin Holiday:
-    
+
     You searched for "Richaun Holmes"
     1 result found.
     Richaun Holmes
     Results for Richaun Holmes:
-    
+
     You searched for "Rodney Hood"
     4 results found.
     0: Rodney Hood
@@ -2649,7 +2310,7 @@ experienced_players
     2: Rodney Monroe
     3: Rodney White
     Results for Rodney Hood:
-    
+
     You searched for "Al Horford"
     5 results found.
     0: Al Horford
@@ -2658,24 +2319,24 @@ experienced_players
     3: Al Wood
     4: Al Thornton
     Results for Al Horford:
-    
+
     You searched for "Talen Horton-Tucker"
     1 result found.
     Talen Horton-Tucker
     Results for Talen Horton-Tucker:
-    
+
     You searched for "Danuel House"
     2 results found.
     0: Danuel House
     1: Daniel Theis
     Results for Danuel House:
-    
+
     You searched for "Dwight Howard"
     2 results found.
     0: Dwight Howard
     1: Dwight Powell
     Results for Dwight Howard:
-    
+
     You searched for "Kevin Huerter"
     5 results found.
     0: Kevin Huerter
@@ -2684,27 +2345,27 @@ experienced_players
     3: Kevin Porter
     4: Kevin Kunnert
     Results for Kevin Huerter:
-    
+
     You searched for "De'Andre Hunter"
     1 result found.
     De'Andre Hunter
     Results for De'Andre Hunter:
-    
+
     You searched for "Chandler Hutchison"
     1 result found.
     Chandler Hutchison
     Results for Chandler Hutchison:
-    
+
     You searched for "Serge Ibaka"
     1 result found.
     Serge Ibaka
     Results for Serge Ibaka:
-    
+
     You searched for "Andre Iguodala"
     1 result found.
     Andre Iguodala
     Results for Andre Iguodala:
-    
+
     You searched for "Joe Ingles"
     7 results found.
     0: Joe Ingles
@@ -2715,7 +2376,7 @@ experienced_players
     5: Jack Tingle
     6: Joe Kleine
     Results for Joe Ingles:
-    
+
     You searched for "Brandon Ingram"
     4 results found.
     0: Brandon Ingram
@@ -2723,18 +2384,18 @@ experienced_players
     2: Brandon Knight
     3: Brandon Hunter
     Results for Brandon Ingram:
-    
+
     You searched for "Kyrie Irving"
     2 results found.
     0: Kyrie Irving
     1: Byron Irvin
     Results for Kyrie Irving:
-    
+
     You searched for "Wesley Iwundu"
     1 result found.
     Wesley Iwundu
     Results for Wesley Iwundu:
-    
+
     You searched for "Frank Jackson"
     15 results found.
     0: Frank Jackson
@@ -2753,7 +2414,7 @@ experienced_players
     13: Tony Jackson
     14: Tony Jackson
     Results for Frank Jackson:
-    
+
     You searched for "Josh Jackson"
     18 results found.
     0: Josh Jackson
@@ -2775,7 +2436,7 @@ experienced_players
     16: Phil Jackson
     17: Ralph Jackson
     Results for Josh Jackson:
-    
+
     You searched for "Justin Jackson"
     8 results found.
     0: Justin Jackson
@@ -2787,7 +2448,7 @@ experienced_players
     6: Justin James
     7: Justin Patton
     Results for Justin Jackson:
-    
+
     You searched for "Reggie Jackson"
     6 results found.
     0: Reggie Jackson
@@ -2797,7 +2458,7 @@ experienced_players
     4: Greg Jackson
     5: Mervin Jackson
     Results for Reggie Jackson:
-    
+
     You searched for "Justin James"
     6 results found.
     0: Justin James
@@ -2807,7 +2468,7 @@ experienced_players
     4: Tim James
     5: Justin Reed
     Results for Justin James:
-    
+
     You searched for "LeBron James"
     5 results found.
     0: LeBron James
@@ -2816,7 +2477,7 @@ experienced_players
     3: Henry James
     4: Jerome James
     Results for LeBron James:
-    
+
     You searched for "Cameron Johnson"
     7 results found.
     0: Cameron Johnson
@@ -2827,7 +2488,7 @@ experienced_players
     5: James Johnson
     6: Ron Johnson
     Results for Cameron Johnson:
-    
+
     You searched for "James Johnson"
     32 results found.
     0: James Johnson
@@ -2863,7 +2524,7 @@ experienced_players
     30: James Jones
     31: James Collins
     Results for James Johnson:
-    
+
     You searched for "Keldon Johnson"
     12 results found.
     0: Keldon Johnson
@@ -2879,7 +2540,7 @@ experienced_players
     10: Linton Johnson
     11: Ron Johnson
     Results for Keldon Johnson:
-    
+
     You searched for "Stanley Johnson"
     9 results found.
     0: Stanley Johnson
@@ -2892,7 +2553,7 @@ experienced_players
     7: Tyler Johnson
     8: Wesley Johnson
     Results for Stanley Johnson:
-    
+
     You searched for "Tyler Johnson"
     18 results found.
     0: Tyler Johnson
@@ -2914,14 +2575,14 @@ experienced_players
     16: Stew Johnson
     17: Wesley Johnson
     Results for Tyler Johnson:
-    
+
     You searched for "Nikola Jokić"
     3 results found.
     0: Nikola Jokic
     1: Nikola Mirotic
     2: Nikola Pekovic
     Results for Nikola Jokic:
-    
+
     You searched for "Damian Jones"
     14 results found.
     0: Damian Jones
@@ -2939,7 +2600,7 @@ experienced_players
     12: Sam Jones
     13: Wali Jones
     Results for Damian Jones:
-    
+
     You searched for "Derrick Jones"
     12 results found.
     0: Derrick Jones
@@ -2955,7 +2616,7 @@ experienced_players
     10: Derrick Alston
     11: Derrick Walton
     Results for Derrick Jones:
-    
+
     You searched for "Tyus Jones"
     17 results found.
     0: Tyus Jones
@@ -2976,13 +2637,13 @@ experienced_players
     15: Wali Jones
     16: Wil Jones
     Results for Tyus Jones:
-    
+
     You searched for "DeAndre Jordan"
     2 results found.
     0: DeAndre Jordan
     1: Eddie Jordan
     Results for DeAndre Jordan:
-    
+
     You searched for "Cory Joseph"
     4 results found.
     0: Cory Joseph
@@ -2990,34 +2651,34 @@ experienced_players
     2: Kris Joseph
     3: Yvon Joseph
     Results for Cory Joseph:
-    
+
     You searched for "Mfiondu Kabengele"
     1 result found.
     Mfiondu Kabengele
     Results for Mfiondu Kabengele:
-    
+
     You searched for "Frank Kaminsky"
     2 results found.
     0: Frank Kaminsky
     1: Frank Ramsey
     Results for Frank Kaminsky:
-    
+
     You searched for "Enes Kanter"
     2 results found.
     0: Enes Kanter
     1: Les Hunter
     Results for Enes Kanter:
-    
+
     You searched for "Luke Kennard"
     1 result found.
     Luke Kennard
     Results for Luke Kennard:
-    
+
     You searched for "Maxi Kleber"
     1 result found.
     Maxi Kleber
     Results for Maxi Kleber:
-    
+
     You searched for "Kevin Knox"
     5 results found.
     0: Kevin Knox
@@ -3026,7 +2687,7 @@ experienced_players
     3: Kevin Lynch
     4: Kelvin Cato
     Results for Kevin Knox:
-    
+
     You searched for "John Konchar"
     8 results found.
     0: John Konchar
@@ -3038,36 +2699,36 @@ experienced_players
     6: John Dickson
     7: John Hargis
     Results for John Konchar:
-    
+
     You searched for "Furkan Korkmaz"
     1 result found.
     Furkan Korkmaz
     Results for Furkan Korkmaz:
-    
+
     You searched for "Luke Kornet"
     1 result found.
     Luke Kornet
     Results for Luke Kornet:
-    
+
     You searched for "Rodions Kurucs"
     1 result found.
     Rodions Kurucs
     Results for Rodions Kurucs:
-    
+
     You searched for "Kyle Kuzma"
     3 results found.
     0: Kyle Kuzma
     1: Kyle Guy
     2: Kyle Macy
     Results for Kyle Kuzma:
-    
+
     You searched for "Zach LaVine"
     3 results found.
     0: Zach LaVine
     1: Mack Calvin
     2: Zach Lofton
     Results for Zach LaVine:
-    
+
     You searched for "Jeremy Lamb"
     6 results found.
     0: Jeremy Lamb
@@ -3077,24 +2738,24 @@ experienced_players
     4: Jeremy Pargo
     5: Jeremy Tyler
     Results for Jeremy Lamb:
-    
+
     You searched for "Jake Layman"
     2 results found.
     0: Jake Layman
     1: Jack Twyman
     Results for Jake Layman:
-    
+
     You searched for "Caris LeVert"
     2 results found.
     0: Caris LeVert
     1: Chris Webber
     Results for Caris LeVert:
-    
+
     You searched for "Jalen Lecque"
     1 result found.
     Jalen Lecque
     Results for Jalen Lecque:
-    
+
     You searched for "Damion Lee"
     9 results found.
     0: Damion Lee
@@ -3107,7 +2768,7 @@ experienced_players
     7: Ron Lee
     8: Davon Reed
     Results for Damion Lee:
-    
+
     You searched for "Alex Len"
     7 results found.
     0: Alex Len
@@ -3118,28 +2779,28 @@ experienced_players
     5: Alex Scales
     6: Hal Hale
     Results for Alex Len:
-    
+
     You searched for "Kawhi Leonard"
     2 results found.
     0: Kawhi Leonard
     1: Gary Leonard
     Results for Kawhi Leonard:
-    
+
     You searched for "Meyers Leonard"
     1 result found.
     Meyers Leonard
     Results for Meyers Leonard:
-    
+
     You searched for "Damian Lillard"
     1 result found.
     Damian Lillard
     Results for Damian Lillard:
-    
+
     You searched for "Nassir Little"
     1 result found.
     Nassir Little
     Results for Nassir Little:
-    
+
     You searched for "Kevon Looney"
     5 results found.
     0: Kevon Looney
@@ -3148,7 +2809,7 @@ experienced_players
     3: Kevin Love
     4: Devon Dotson
     Results for Kevon Looney:
-    
+
     You searched for "Brook Lopez"
     4 results found.
     0: Brook Lopez
@@ -3156,7 +2817,7 @@ experienced_players
     2: Robin Lopez
     3: Brook Steppe
     Results for Brook Lopez:
-    
+
     You searched for "Robin Lopez"
     4 results found.
     0: Robin Lopez
@@ -3164,7 +2825,7 @@ experienced_players
     2: Brook Lopez
     3: Raul Lopez
     Results for Robin Lopez:
-    
+
     You searched for "Kevin Love"
     15 results found.
     0: Kevin Love
@@ -3183,7 +2844,7 @@ experienced_players
     13: Kelvin Cato
     14: Melvin Ely
     Results for Kevin Love:
-    
+
     You searched for "Kyle Lowry"
     4 results found.
     0: Kyle Lowry
@@ -3191,12 +2852,12 @@ experienced_players
     2: Kyle Macy
     3: Kyle Korver
     Results for Kyle Lowry:
-    
+
     You searched for "Timothé Luwawu-Cabarrot"
     1 result found.
     Timothe Luwawu-Cabarrot
     Results for Timothe Luwawu-Cabarrot:
-    
+
     You searched for "Trey Lyles"
     5 results found.
     0: Trey Lyles
@@ -3205,7 +2866,7 @@ experienced_players
     3: Terry Tyler
     4: Trey Burke
     Results for Trey Lyles:
-    
+
     You searched for "Thon Maker"
     8 results found.
     0: Thon Maker
@@ -3217,22 +2878,22 @@ experienced_players
     6: Tom Riker
     7: Von Wafer
     Results for Thon Maker:
-    
+
     You searched for "Terance Mann"
     1 result found.
     Terance Mann
     Results for Terance Mann:
-    
+
     You searched for "Boban Marjanović"
     1 result found.
     Boban Marjanovic
     Results for Boban Marjanovic:
-    
+
     You searched for "Lauri Markkanen"
     1 result found.
     Lauri Markkanen
     Results for Lauri Markkanen:
-    
+
     You searched for "Caleb Martin"
     9 results found.
     0: Caleb Martin
@@ -3245,7 +2906,7 @@ experienced_players
     7: LaRue Martin
     8: Slater Martin
     Results for Caleb Martin:
-    
+
     You searched for "Cody Martin"
     9 results found.
     0: Cody Martin
@@ -3258,7 +2919,7 @@ experienced_players
     7: Jeff Martin
     8: Phil Martin
     Results for Cody Martin:
-    
+
     You searched for "Kelan Martin"
     8 results found.
     0: Kelan Martin
@@ -3270,29 +2931,29 @@ experienced_players
     6: Don Martin
     7: Jeff Martin
     Results for Kelan Martin:
-    
+
     You searched for "Garrison Mathews"
     1 result found.
     Garrison Mathews
     Results for Garrison Mathews:
-    
+
     You searched for "Wesley Matthews"
     2 results found.
     0: Wesley Matthews
     1: Wes Matthews
     Results for Wesley Matthews:
-    
+
     You searched for "CJ McCollum"
     2 results found.
     0: CJ McCollum
     1: Ray McCallum
     Results for CJ McCollum:
-    
+
     You searched for "T.J. McConnell"
     1 result found.
     T.J. McConnell
     Results for T.J. McConnell:
-    
+
     You searched for "Jalen McDaniels"
     4 results found.
     0: Jalen McDaniels
@@ -3300,61 +2961,61 @@ experienced_players
     2: Jim McDaniels
     3: Xavier McDaniel
     Results for Jalen McDaniels:
-    
+
     You searched for "Doug McDermott"
     2 results found.
     0: Doug McDermott
     1: Sean McDermott
     Results for Doug McDermott:
-    
+
     You searched for "JaVale McGee"
     1 result found.
     JaVale McGee
     Results for JaVale McGee:
-    
+
     You searched for "Rodney McGruder"
     1 result found.
     Rodney McGruder
     Results for Rodney McGruder:
-    
+
     You searched for "Alfonzo McKinnie"
     1 result found.
     Alfonzo McKinnie
     Results for Alfonzo McKinnie:
-    
+
     You searched for "Jordan McLaughlin"
     1 result found.
     Jordan McLaughlin
     Results for Jordan McLaughlin:
-    
+
     You searched for "Ben McLemore"
     3 results found.
     0: Ben McLemore
     1: Len Elmore
     2: Ben Moore
     Results for Ben McLemore:
-    
+
     You searched for "Nicolò Melli"
     1 result found.
     Nicolo Melli
     Results for Nicolo Melli:
-    
+
     You searched for "De'Anthony Melton"
     1 result found.
     De'Anthony Melton
     Results for De'Anthony Melton:
-    
+
     You searched for "Chimezie Metu"
     1 result found.
     Chimezie Metu
     Results for Chimezie Metu:
-    
+
     You searched for "Khris Middleton"
     2 results found.
     0: Khris Middleton
     1: Chris Singleton
     Results for Khris Middleton:
-    
+
     You searched for "Darius Miller"
     7 results found.
     0: Darius Miller
@@ -3365,35 +3026,35 @@ experienced_players
     5: Larry Miller
     6: Darius Morris
     Results for Darius Miller:
-    
+
     You searched for "Patty Mills"
     3 results found.
     0: Patty Mills
     1: Terry Mills
     2: Jay Miller
     Results for Patty Mills:
-    
+
     You searched for "Paul Millsap"
     2 results found.
     0: Paul Millsap
     1: Paul Silas
     Results for Paul Millsap:
-    
+
     You searched for "Shake Milton"
     1 result found.
     Shake Milton
     Results for Shake Milton:
-    
+
     You searched for "Donovan Mitchell"
     1 result found.
     Donovan Mitchell
     Results for Donovan Mitchell:
-    
+
     You searched for "Adam Mokoka"
     1 result found.
     Adam Mokoka
     Results for Adam Mokoka:
-    
+
     You searched for "Malik Monk"
     5 results found.
     0: Malik Monk
@@ -3402,12 +3063,12 @@ experienced_players
     3: Mark Macon
     4: Malik Newman
     Results for Malik Monk:
-    
+
     You searched for "E'Twaun Moore"
     1 result found.
     E'Twaun Moore
     Results for E'Twaun Moore:
-    
+
     You searched for "Ja Morant"
     7 results found.
     0: Ja Morant
@@ -3418,7 +3079,7 @@ experienced_players
     5: Jim Nolan
     6: Jake Ford
     Results for Ja Morant:
-    
+
     You searched for "Juwan Morgan"
     4 results found.
     0: Juwan Morgan
@@ -3426,7 +3087,7 @@ experienced_players
     2: Juwan Howard
     3: Ja Morant
     Results for Juwan Morgan:
-    
+
     You searched for "Marcus Morris"
     5 results found.
     0: Marcus Morris
@@ -3435,51 +3096,51 @@ experienced_players
     3: Chris Morris
     4: Max Morris
     Results for Marcus Morris:
-    
+
     You searched for "Markieff Morris"
     1 result found.
     Markieff Morris
     Results for Markieff Morris:
-    
+
     You searched for "Monte Morris"
     2 results found.
     0: Monte Morris
     1: Max Morris
     Results for Monte Morris:
-    
+
     You searched for "Mychal Mulder"
     1 result found.
     Mychal Mulder
     Results for Mychal Mulder:
-    
+
     You searched for "Dejounte Murray"
     1 result found.
     Dejounte Murray
     Results for Dejounte Murray:
-    
+
     You searched for "Jamal Murray"
     3 results found.
     0: Jamal Murray
     1: Lamond Murray
     2: Ronald Murray
     Results for Jamal Murray:
-    
+
     You searched for "Mike Muscala"
     2 results found.
     0: Mike Muscala
     1: Mike Maloy
     Results for Mike Muscala:
-    
+
     You searched for "Sviatoslav Mykhailiuk"
     1 result found.
     Sviatoslav Mykhailiuk
     Results for Sviatoslav Mykhailiuk:
-    
+
     You searched for "Abdel Nader"
     1 result found.
     Abdel Nader
     Results for Abdel Nader:
-    
+
     You searched for "Larry Nance"
     17 results found.
     0: Larry Nance
@@ -3500,7 +3161,7 @@ experienced_players
     15: Larry Mikan
     16: Larry Owens
     Results for Larry Nance:
-    
+
     You searched for "Raul Neto"
     7 results found.
     0: Raul Neto
@@ -3511,7 +3172,7 @@ experienced_players
     5: Raul Lopez
     6: Paul Nolen
     Results for Raul Neto:
-    
+
     You searched for "Georges Niang"
     4 results found.
     0: Georges Niang
@@ -3519,34 +3180,34 @@ experienced_players
     2: George King
     3: George Mikan
     Results for Georges Niang:
-    
+
     You searched for "Nerlens Noel"
     1 result found.
     Nerlens Noel
     Results for Nerlens Noel:
-    
+
     You searched for "Jaylen Nowell"
     3 results found.
     0: Jaylen Nowell
     1: Myles Powell
     2: Bailey Howell
     Results for Jaylen Nowell:
-    
+
     You searched for "Frank Ntilikina"
     1 result found.
     Frank Ntilikina
     Results for Frank Ntilikina:
-    
+
     You searched for "Kendrick Nunn"
     1 result found.
     Kendrick Nunn
     Results for Kendrick Nunn:
-    
+
     You searched for "Jusuf Nurkić"
     1 result found.
     Jusuf Nurkic
     Results for Jusuf Nurkic:
-    
+
     You searched for "David Nwaba"
     6 results found.
     0: David Nwaba
@@ -3556,22 +3217,22 @@ experienced_players
     4: David Wood
     5: David Burns
     Results for David Nwaba:
-    
+
     You searched for "Royce O'Neale"
     1 result found.
     Royce O'Neale
     Results for Royce O'Neale:
-    
+
     You searched for "Semi Ojeleye"
     1 result found.
     Semi Ojeleye
     Results for Semi Ojeleye:
-    
+
     You searched for "Jahlil Okafor"
     1 result found.
     Jahlil Okafor
     Results for Jahlil Okafor:
-    
+
     You searched for "Josh Okogie"
     4 results found.
     0: Josh Okogie
@@ -3579,22 +3240,22 @@ experienced_players
     2: Josh Boone
     3: Josh Green
     Results for Josh Okogie:
-    
+
     You searched for "KZ Okpala"
     1 result found.
     KZ Okpala
     Results for KZ Okpala:
-    
+
     You searched for "Victor Oladipo"
     1 result found.
     Victor Oladipo
     Results for Victor Oladipo:
-    
+
     You searched for "Kelly Olynyk"
     1 result found.
     Kelly Olynyk
     Results for Kelly Olynyk:
-    
+
     You searched for "Miye Oni"
     4 results found.
     0: Miye Oni
@@ -3602,32 +3263,32 @@ experienced_players
     2: Mike Lynn
     3: Mike Brown
     Results for Miye Oni:
-    
+
     You searched for "Cedi Osman"
     1 result found.
     Cedi Osman
     Results for Cedi Osman:
-    
+
     You searched for "Kelly Oubre"
     1 result found.
     Kelly Oubre
     Results for Kelly Oubre:
-    
+
     You searched for "Eric Paschall"
     1 result found.
     Eric Paschall
     Results for Eric Paschall:
-    
+
     You searched for "Anžejs Pasečņiks"
     1 result found.
     Anzejs Pasecniks
     Results for Anzejs Pasecniks:
-    
+
     You searched for "Patrick Patterson"
     1 result found.
     Patrick Patterson
     Results for Patrick Patterson:
-    
+
     You searched for "Chris Paul"
     15 results found.
     0: Chris Paul
@@ -3646,40 +3307,40 @@ experienced_players
     13: Chris Welp
     14: Chris Silva
     Results for Chris Paul:
-    
+
     You searched for "Cameron Payne"
     2 results found.
     0: Cameron Payne
     1: Aron Baynes
     Results for Cameron Payne:
-    
+
     You searched for "Elfrid Payton"
     1 result found.
     Elfrid Payton
     Results for Elfrid Payton:
-    
+
     You searched for "Theo Pinson"
     2 results found.
     0: Theo Pinson
     1: Fred Vinson
     Results for Theo Pinson:
-    
+
     You searched for "Mason Plumlee"
     2 results found.
     0: Mason Plumlee
     1: Miles Plumlee
     Results for Mason Plumlee:
-    
+
     You searched for "Jakob Poeltl"
     1 result found.
     Jakob Poeltl
     Results for Jakob Poeltl:
-    
+
     You searched for "Vincent Poirier"
     1 result found.
     Vincent Poirier
     Results for Vincent Poirier:
-    
+
     You searched for "Jordan Poole"
     9 results found.
     0: Jordan Poole
@@ -3692,7 +3353,7 @@ experienced_players
     7: Jordan Loyd
     8: Jordan McRae
     Results for Jordan Poole:
-    
+
     You searched for "Michael Porter"
     6 results found.
     0: Michael Porter
@@ -3702,13 +3363,13 @@ experienced_players
     4: Michael Curry
     5: Michael Redd
     Results for Michael Porter:
-    
+
     You searched for "Otto Porter"
     2 results found.
     0: Otto Porter
     1: Otto Moore
     Results for Otto Porter:
-    
+
     You searched for "Bobby Portis"
     7 results found.
     0: Bobby Portis
@@ -3719,49 +3380,49 @@ experienced_players
     5: Bobby Hooper
     6: Bob Portman
     Results for Bobby Portis:
-    
+
     You searched for "Kristaps Porziņģis"
     1 result found.
     Kristaps Porzingis
     Results for Kristaps Porzingis:
-    
+
     You searched for "Dwight Powell"
     3 results found.
     0: Dwight Powell
     1: Dwight Howard
     2: Dwight Jones
     Results for Dwight Powell:
-    
+
     You searched for "Norman Powell"
     1 result found.
     Norman Powell
     Results for Norman Powell:
-    
+
     You searched for "Taurean Prince"
     3 results found.
     0: Taurean Prince
     1: Tayshaun Prince
     2: Taurean Green
     Results for Taurean Prince:
-    
+
     You searched for "Julius Randle"
     3 results found.
     0: Julius Randle
     1: Julius Hodge
     2: Julius Erving
     Results for Julius Randle:
-    
+
     You searched for "Cam Reddish"
     1 result found.
     Cam Reddish
     Results for Cam Reddish:
-    
+
     You searched for "J.J. Redick"
     2 results found.
     0: J.J. Redick
     1: J.R. Reid
     Results for J.J. Redick:
-    
+
     You searched for "Naz Reid"
     8 results found.
     0: Naz Reid
@@ -3773,7 +3434,7 @@ experienced_players
     6: Ron Reed
     7: J.R. Reid
     Results for Naz Reid:
-    
+
     You searched for "Josh Richardson"
     4 results found.
     0: Josh Richardson
@@ -3781,12 +3442,12 @@ experienced_players
     2: Jason Richardson
     3: Norm Richardson
     Results for Josh Richardson:
-    
+
     You searched for "Austin Rivers"
     1 result found.
     Austin Rivers
     Results for Austin Rivers:
-    
+
     You searched for "Duncan Robinson"
     4 results found.
     0: Duncan Robinson
@@ -3794,7 +3455,7 @@ experienced_players
     2: Justin Robinson
     3: Rumeal Robinson
     Results for Duncan Robinson:
-    
+
     You searched for "Glenn Robinson"
     6 results found.
     0: Glenn Robinson
@@ -3804,7 +3465,7 @@ experienced_players
     4: Devin Robinson
     5: Wayne Robinson
     Results for Glenn Robinson:
-    
+
     You searched for "Jerome Robinson"
     5 results found.
     0: Jerome Robinson
@@ -3813,25 +3474,25 @@ experienced_players
     3: Jackie Robinson
     4: James Robinson
     Results for Jerome Robinson:
-    
+
     You searched for "Mitchell Robinson"
     1 result found.
     Mitchell Robinson
     Results for Mitchell Robinson:
-    
+
     You searched for "Isaiah Roby"
     3 results found.
     0: Isaiah Roby
     1: Isaiah Joe
     2: Isaiah Rider
     Results for Isaiah Roby:
-    
+
     You searched for "Rajon Rondo"
     2 results found.
     0: Rajon Rondo
     1: Brandon Roy
     Results for Rajon Rondo:
-    
+
     You searched for "Derrick Rose"
     9 results found.
     0: Derrick Rose
@@ -3844,13 +3505,13 @@ experienced_players
     7: Derrick Favors
     8: Rick Robey
     Results for Derrick Rose:
-    
+
     You searched for "Terrence Ross"
     2 results found.
     0: Terrence Ross
     1: Terrence Jones
     Results for Terrence Ross:
-    
+
     You searched for "Terry Rozier"
     9 results found.
     0: Terry Rozier
@@ -3863,7 +3524,7 @@ experienced_players
     7: Terry Duerod
     8: Terry Furlow
     Results for Terry Rozier:
-    
+
     You searched for "Ricky Rubio"
     7 results found.
     0: Ricky Rubio
@@ -3874,44 +3535,44 @@ experienced_players
     5: Ricky Grace
     6: Ricky Marsh
     Results for Ricky Rubio:
-    
+
     You searched for "D'Angelo Russell"
     1 result found.
     D'Angelo Russell
     Results for D'Angelo Russell:
-    
+
     You searched for "Domantas Sabonis"
     1 result found.
     Domantas Sabonis
     Results for Domantas Sabonis:
-    
+
     You searched for "Luka Šamanić"
     1 result found.
     Luka Samanic
     Results for Luka Samanic:
-    
+
     You searched for "JaKarr Sampson"
     2 results found.
     0: JaKarr Sampson
     1: Jamal Sampson
     Results for JaKarr Sampson:
-    
+
     You searched for "Dario Šarić"
     2 results found.
     0: Dario Saric
     1: Marko Jaric
     Results for Dario Saric:
-    
+
     You searched for "Tomáš Satoranský"
     1 result found.
     Tomas Satoransky
     Results for Tomas Satoransky:
-    
+
     You searched for "Dennis Schröder"
     1 result found.
     Dennis Schroder
     Results for Dennis Schroder:
-    
+
     You searched for "Mike Scott"
     22 results found.
     0: Mike Scott
@@ -3937,22 +3598,22 @@ experienced_players
     20: Mike Price
     21: Mike Wilks
     Results for Mike Scott:
-    
+
     You searched for "Collin Sexton"
     1 result found.
     Collin Sexton
     Results for Collin Sexton:
-    
+
     You searched for "Landry Shamet"
     1 result found.
     Landry Shamet
     Results for Landry Shamet:
-    
+
     You searched for "Pascal Siakam"
     1 result found.
     Pascal Siakam
     Results for Pascal Siakam:
-    
+
     You searched for "Chris Silva"
     15 results found.
     0: Chris Silva
@@ -3971,7 +3632,7 @@ experienced_players
     13: Chris Quinn
     14: Chris Taft
     Results for Chris Silva:
-    
+
     You searched for "Ben Simmons"
     4 results found.
     0: Ben Simmons
@@ -3979,12 +3640,12 @@ experienced_players
     2: Grant Simmons
     3: Kobi Simmons
     Results for Ben Simmons:
-    
+
     You searched for "Anfernee Simons"
     1 result found.
     Anfernee Simons
     Results for Anfernee Simons:
-    
+
     You searched for "Marcus Smart"
     4 results found.
     0: Marcus Smart
@@ -3992,7 +3653,7 @@ experienced_players
     2: Marcus Camby
     3: Marcus Fizer
     Results for Marcus Smart:
-    
+
     You searched for "Dennis Smith"
     15 results found.
     0: Dennis Smith
@@ -4011,7 +3672,7 @@ experienced_players
     13: Otis Smith
     14: Reggie Smith
     Results for Dennis Smith:
-    
+
     You searched for "Ish Smith"
     34 results found.
     0: Ish Smith
@@ -4049,7 +3710,7 @@ experienced_players
     32: Sam Stith
     33: Tom Stith
     Results for Ish Smith:
-    
+
     You searched for "Tony Snell"
     16 results found.
     0: Tony Snell
@@ -4069,24 +3730,24 @@ experienced_players
     14: Tony White
     15: Tony Dawson
     Results for Tony Snell:
-    
+
     You searched for "Max Strus"
     3 results found.
     0: Max Strus
     1: Max Morris
     2: Mark West
     Results for Max Strus:
-    
+
     You searched for "Edmond Sumner"
     1 result found.
     Edmond Sumner
     Results for Edmond Sumner:
-    
+
     You searched for "Jayson Tatum"
     1 result found.
     Jayson Tatum
     Results for Jayson Tatum:
-    
+
     You searched for "Jeff Teague"
     7 results found.
     0: Jeff Teague
@@ -4097,12 +3758,12 @@ experienced_players
     5: Jeff Green
     6: Jeff Withey
     Results for Jeff Teague:
-    
+
     You searched for "Garrett Temple"
     1 result found.
     Garrett Temple
     Results for Garrett Temple:
-    
+
     You searched for "Daniel Theis"
     4 results found.
     0: Daniel Theis
@@ -4110,7 +3771,7 @@ experienced_players
     2: Daniel Oturu
     3: Daniel Orton
     Results for Daniel Theis:
-    
+
     You searched for "Matt Thomas"
     15 results found.
     0: Matt Thomas
@@ -4129,32 +3790,32 @@ experienced_players
     13: Matt Mazza
     14: Matt Othick
     Results for Matt Thomas:
-    
+
     You searched for "Tristan Thompson"
     1 result found.
     Tristan Thompson
     Results for Tristan Thompson:
-    
+
     You searched for "Sindarius Thornwell"
     1 result found.
     Sindarius Thornwell
     Results for Sindarius Thornwell:
-    
+
     You searched for "Matisse Thybulle"
     1 result found.
     Matisse Thybulle
     Results for Matisse Thybulle:
-    
+
     You searched for "Juan Toscano-Anderson"
     1 result found.
     Juan Toscano-Anderson
     Results for Juan Toscano-Anderson:
-    
+
     You searched for "Karl-Anthony Towns"
     1 result found.
     Karl-Anthony Towns
     Results for Karl-Anthony Towns:
-    
+
     You searched for "Gary Trent"
     14 results found.
     0: Gary Trent
@@ -4172,7 +3833,7 @@ experienced_players
     12: Gary Freeman
     13: Gary Suiter
     Results for Gary Trent:
-    
+
     You searched for "P.J. Tucker"
     5 results found.
     0: P.J. Tucker
@@ -4181,48 +3842,48 @@ experienced_players
     3: Jim Tucker
     4: B.J. Tyler
     Results for P.J. Tucker:
-    
+
     You searched for "Myles Turner"
     3 results found.
     0: Myles Turner
     1: Bill Turner
     2: Wayne Turner
     Results for Myles Turner:
-    
+
     You searched for "Jonas Valančiūnas"
     1 result found.
     Jonas Valanciunas
     Results for Jonas Valanciunas:
-    
+
     You searched for "Denzel Valentine"
     2 results found.
     0: Denzel Valentine
     1: Darnell Valentine
     Results for Denzel Valentine:
-    
+
     You searched for "Fred VanVleet"
     1 result found.
     Fred VanVleet
     Results for Fred VanVleet:
-    
+
     You searched for "Jarred Vanderbilt"
     1 result found.
     Jarred Vanderbilt
     Results for Jarred Vanderbilt:
-    
+
     You searched for "Gabe Vincent"
     3 results found.
     0: Gabe Vincent
     1: Jay Vincent
     2: Sam Vincent
     Results for Gabe Vincent:
-    
+
     You searched for "Nikola Vučević"
     2 results found.
     0: Nikola Vucevic
     1: Nikola Pekovic
     Results for Nikola Vucevic:
-    
+
     You searched for "Dean Wade"
     8 results found.
     0: Dean Wade
@@ -4234,13 +3895,13 @@ experienced_players
     6: Don Dee
     7: Leon Wood
     Results for Dean Wade:
-    
+
     You searched for "Moritz Wagner"
     2 results found.
     0: Moritz Wagner
     1: Milt Wagner
     Results for Moritz Wagner:
-    
+
     You searched for "Kemba Walker"
     4 results found.
     0: Kemba Walker
@@ -4248,14 +3909,14 @@ experienced_players
     2: Henry Walker
     3: Jimmy Walker
     Results for Kemba Walker:
-    
+
     You searched for "Lonnie Walker"
     3 results found.
     0: Lonnie Walker
     1: Horace Walker
     2: Kenny Walker
     Results for Lonnie Walker:
-    
+
     You searched for "John Wall"
     21 results found.
     0: John Wall
@@ -4280,12 +3941,12 @@ experienced_players
     19: John Logan
     20: John Lucas
     Results for John Wall:
-    
+
     You searched for "Brad Wanamaker"
     1 result found.
     Brad Wanamaker
     Results for Brad Wanamaker:
-    
+
     You searched for "T.J. Warren"
     5 results found.
     0: T.J. Warren
@@ -4294,7 +3955,7 @@ experienced_players
     3: John Warren
     4: C.J. Watson
     Results for T.J. Warren:
-    
+
     You searched for "P.J. Washington"
     5 results found.
     0: P.J. Washington
@@ -4303,17 +3964,17 @@ experienced_players
     3: Pearl Washington
     4: Stan Washington
     Results for P.J. Washington:
-    
+
     You searched for "Yuta Watanabe"
     1 result found.
     Yuta Watanabe
     Results for Yuta Watanabe:
-    
+
     You searched for "Tremont Waters"
     1 result found.
     Tremont Waters
     Results for Tremont Waters:
-    
+
     You searched for "Paul Watson"
     10 results found.
     0: Paul Watson
@@ -4327,12 +3988,12 @@ experienced_players
     8: Paul Long
     9: Samuel Watts
     Results for Paul Watson:
-    
+
     You searched for "Russell Westbrook"
     1 result found.
     Russell Westbrook
     Results for Russell Westbrook:
-    
+
     You searched for "Coby White"
     13 results found.
     0: Coby White
@@ -4349,7 +4010,7 @@ experienced_players
     11: Royce White
     12: Joby Wright
     Results for Coby White:
-    
+
     You searched for "Derrick White"
     6 results found.
     0: Derrick White
@@ -4359,18 +4020,18 @@ experienced_players
     4: Derrick Walton
     5: Derrick Brown
     Results for Derrick White:
-    
+
     You searched for "Hassan Whiteside"
     1 result found.
     Hassan Whiteside
     Results for Hassan Whiteside:
-    
+
     You searched for "Andrew Wiggins"
     2 results found.
     0: Andrew Wiggins
     1: DeAndre Liggins
     Results for Andrew Wiggins:
-    
+
     You searched for "Grant Williams"
     34 results found.
     0: Grant Williams
@@ -4408,7 +4069,7 @@ experienced_players
     32: Troy Williams
     33: Ward Williams
     Results for Grant Williams:
-    
+
     You searched for "Kenrich Williams"
     6 results found.
     0: Kenrich Williams
@@ -4418,7 +4079,7 @@ experienced_players
     4: Kenny Williams
     5: Kevin Williams
     Results for Kenrich Williams:
-    
+
     You searched for "Lou Williams"
     44 results found.
     0: Lou Williams
@@ -4466,7 +4127,7 @@ experienced_players
     42: Walt Williams
     43: Ward Williams
     Results for Lou Williams:
-    
+
     You searched for "Robert Williams"
     7 results found.
     0: Robert Williams
@@ -4477,7 +4138,7 @@ experienced_players
     5: Herb Williams
     6: Ron Williams
     Results for Robert Williams:
-    
+
     You searched for "Zion Williamson"
     5 results found.
     0: Zion Williamson
@@ -4486,7 +4147,7 @@ experienced_players
     3: Elliot Williams
     4: Jayson Williams
     Results for Zion Williamson:
-    
+
     You searched for "D.J. Wilson"
     7 results found.
     0: D.J. Wilson
@@ -4497,12 +4158,12 @@ experienced_players
     5: Jim Wilson
     6: Rick Wilson
     Results for D.J. Wilson:
-    
+
     You searched for "Christian Wood"
     1 result found.
     Christian Wood
     Results for Christian Wood:
-    
+
     You searched for "Delon Wright"
     4 results found.
     0: Delon Wright
@@ -4510,12 +4171,12 @@ experienced_players
     2: Dorell Wright
     3: Julian Wright
     Results for Delon Wright:
-    
+
     You searched for "Thaddeus Young"
     1 result found.
     Thaddeus Young
     Results for Thaddeus Young:
-    
+
     You searched for "Trae Young"
     8 results found.
     0: Trae Young
@@ -4527,7 +4188,7 @@ experienced_players
     6: Perry Young
     7: Tre Jones
     Results for Trae Young:
-    
+
     You searched for "Cody Zeller"
     8 results found.
     0: Cody Zeller
@@ -4539,39 +4200,22 @@ experienced_players
     6: Harry Zeller
     7: Luke Zeller
     Results for Cody Zeller:
-    
+
     You searched for "Ivica Zubac"
     1 result found.
     Ivica Zubac
     Results for Ivica Zubac:
-    
 
 
-    <ipython-input-12-1e329a1e49c7>:14: SettingWithCopyWarning: 
+
+    <ipython-input-12-1e329a1e49c7>:14: SettingWithCopyWarning:
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
-    
+
     See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
       experienced_players['FT Pct'] = experienced_players.apply(lambda row: get_avg_ft_pct(row), axis=1)
 
-
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -4749,29 +4393,15 @@ experienced_players
 <p>395 rows × 11 columns</p>
 </div>
 
-
-
-##### The API used to collect the data was not able to get the Free Throw Percentage of all active and experienced players. Players that were left out were stored in a list. These players' Free Throw Percentage will be retrieved from the website (basketball-reference.com) and added manually.
-
-
 ```python
 len(players_left)
 ```
 
-
-
-
     30
-
-
-
 
 ```python
 players_left
 ```
-
-
-
 
     ['Marvin Bagley',
      'Mohamed Bamba',
@@ -4804,38 +4434,18 @@ players_left
      'P.J. Tucker',
      'Hassan Whiteside']
 
-
-
 # Drop unneccessary columns
-
 
 ```python
 columns_to_drop = ['From', 'To', 'Pos', 'Ht', 'Wt', 'Birth Date', 'Colleges']
 required_data = experienced_players.drop(columns=columns_to_drop)
 ```
 
-
 ```python
 required_data
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -4929,31 +4539,25 @@ required_data
 <p>395 rows × 4 columns</p>
 </div>
 
-
-
 # Generate graph
 
-
 ```python
-required_data.to_csv('requiredData.csv')
+# To add the free throw percentage data for the remaining players, the required data is saved into a CSV file and updated manually
+# required_data.to_csv('requiredData.csv')
 ```
 
-
 ```python
+# After updating the CSV file containing the required data, the modified CSV file is loaded to generate a graph and calculate correlation
 data_df = pd.read_csv('requiredData.csv')
 ```
-
 
 ```python
 ax1 = data_df.plot.scatter(x='Height(cm)', y='FT Pct')
 ```
 
-
-![png](HeightVsFreeThrowPct_files/HeightVsFreeThrowPct_27_0.png)
-
+![png](HeightVsFreeThrowPct_files/HeightVsFreeThrowPct_24_0.png)
 
 # Calculating Pearson Product-Moment Correlation Coefficient
-
 
 ```python
 # Get Covariance of both variables
@@ -4963,23 +4567,7 @@ height_and_ft_df = data_df.drop(columns=['Unnamed: 0', 'Player', 'Years Played']
 height_and_ft_df.cov()
 ```
 
-
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -5003,35 +4591,24 @@ height_and_ft_df.cov()
 </table>
 </div>
 
-
-
-
 ```python
 # We know that the covariance of the two variables is -0.315670
 covariance_x_y = -0.315670
 ```
-
 
 ```python
 # Get standard deviation of each variable
 height_and_ft_df.std()
 ```
 
-
-
-
     Height(cm)    8.737559
     FT Pct        0.103652
     dtype: float64
-
-
-
 
 ```python
 standard_deviation_x = 8.737559
 standard_deviation_y = 0.103652
 ```
-
 
 ```python
 # Plug in calculated values into correlation formula
@@ -5040,9 +4617,4 @@ coefficient = covariance_x_y / (standard_deviation_x * standard_deviation_y)
 coefficient
 ```
 
-
-
-
     -0.34855033346874775
-
-
