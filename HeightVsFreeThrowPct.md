@@ -699,10 +699,6 @@ experienced_players['Player'] = experienced_players.apply(lambda row: remove_slu
 experienced_players
 ```
 
-# <<<<<<< HEAD
-
-> > > > > > > a260399f2bee2ee78a7cbc7d47700eaa562f58a0
-
 <div>
 <table border="1" class="dataframe">
   <thead>
