@@ -27,7 +27,7 @@ def levenshtein(s1, s2, maximum):
     returned. If many matches are found, either identical or distanced, all
     are returned for final user approval.
 """
-def lookup(player):
+def lookup(player, default_selection=False):
     path = os.path.join(os.path.dirname(__file__), 'br_names.txt')
     normalized = unidecode.unidecode(player)
     matches = []
@@ -62,7 +62,11 @@ def lookup(player):
             print("{}: {}".format(i, match[0])) 
             i += 1           
         
-        selection = int(input("Pick one: "))
+        if(default_selection is True):
+           selection = 0
+        else:
+            selection = int(input("Pick one: "))
+        
         print("Results for {}:\n".format(matches[selection][0]))
         return matches[selection][0]
 
